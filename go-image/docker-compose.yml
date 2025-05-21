@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "28080:28080"
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./static/uploads:/app/static/uploads  # 可选：挂载上传目录以便持久化
+    restart: unless-stopped
