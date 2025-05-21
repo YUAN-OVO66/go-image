@@ -2,7 +2,7 @@
 
 ## 项目简介
 
-Go-Image 是一个使用 Go 语言与Trae开发的轻量级个人图床软件，提供图片上传、存储、管理和分享功能。
+Go-Image 是一个使用 Go 语言开发的轻量级个人图床软件，提供图片上传、存储、管理和分享功能。
 
 ## 功能特点
 
@@ -50,26 +50,23 @@ Go-Image 是一个使用 Go 语言与Trae开发的轻量级个人图床软件，
 ### 安装步骤
 
 1. 克隆仓库
-
    ```
-   git clone https://github.com/yourusername/go-image.git
+   git clone https://github.com/YUAN-OVO66/go-image.git
    cd go-image
    ```
 
 2. 安装依赖
-
    ```
    go mod tidy
    ```
 
 3. 运行应用
-
    ```
    go run cmd/server/main.go
    ```
 
 4. 访问应用
-   打开浏览器，访问 `http://localhost:8080`
+   打开浏览器，访问 `http://localhost:28080`
 
 ## 配置说明
 
