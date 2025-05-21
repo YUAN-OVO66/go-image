@@ -1,0 +1,33 @@
+# 服务器配置
+server:
+  port: 8080
+  host: localhost
+
+# 上传配置
+upload:
+  # 最大文件大小 (MB)
+  max_size: 10
+  # 允许的文件类型
+  allowed_types:
+    - image/jpeg
+    - image/png
+    - image/gif
+    - image/webp
+  # 存储路径
+  storage_path: "static/uploads"
+  # 缩略图设置
+  thumbnail:
+    enabled: true
+    width: 300
+    height: 300
+    path: "static/uploads/thumbnails"
+
+# 用户认证
+auth:
+  enabled: true
+  # 会话密钥
+  session_secret: "change-this-to-a-random-string"
+  # 默认管理员账户
+  admin:
+    username: "admin"
+    password: "admin123"

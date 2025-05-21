@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/progress-bar.css">
+    <link rel="icon" type="image/svg+xml" href="/static/images/favicon.svg">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <img src="/static/images/logo.svg" alt="Go-Image Logo" class="logo">
+                <h1>Go-Image 个人图床</h1>
+            </div>
+            <nav>
+                <a href="/">首页</a>
+                <a href="/upload">上传图片</a>
+                <a href="/images">我的图片</a>
+                <a href="/logout">退出登录</a>
+            </nav>
+        </header>
+
+        <main>
+            <section class="images-section">
+                <h2>我的图片</h2>
+                
+                <div class="storage-info">
+                    <div class="storage-chart-container">
+                        <canvas id="storage-chart"></canvas>
+                    </div>
+                    <div class="storage-details">
+                        <p>已使用：<span id="used-storage">{{ .usedStorage }}</span></p>
+                        <p>总容量：<span id="total-storage">{{ .totalStorage }}</span></p>
+                    </div>
+                </div>
+                
+                <div class="search-bar">
+                    <input type="text" id="search-input" placeholder="搜索图片...">
+                    <button id="search-button" class="btn small">搜索</button>
+                </div>
+                
+                <div class="image-grid" id="image-grid">
+                    {{ if .images }}
+                        {{ range .images }}
+                        <div class="image-card" data-id="{{ .ID }}">
+                            <div class="image-preview">
+                                <img src="/i/{{ .ID }}?thumb=1" alt="{{ .Filename }}">
+                            </div>
+                            <div class="image-info">
+                                <p class="image-name">{{ .Filename }}</p>
+                                <p class="image-date">{{ .UploadedAt.Format "2006-01-02 15:04:05" }}</p>
+                            </div>
+                            <div class="image-actions">
+                                <button class="btn small view-btn" data-id="{{ .ID }}">查看</button>
+                                <button class="btn small copy-btn" data-url="/i/{{ .ID }}">复制链接</button>
+                                <button class="btn small delete-btn" data-id="{{ .ID }}">删除</button>
+                            </div>
+                        </div>
+                        {{ end }}
+                    {{ else }}
+                        <div class="no-images">
+                            <p>暂无图片，去上传一些吧！</p>
+                            <a href="/upload" class="btn primary">上传图片</a>
+                        </div>
+                    {{ end }}
+                </div>
+                
+                <div id="image-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <div class="modal-image">
+                            <img id="modal-image-preview" src="" alt="图片预览">
+                        </div>
+                        <div class="modal-info">
+                            <h3 id="modal-image-name"></h3>
+                            <p id="modal-image-date"></p>
+                            <p id="modal-image-size"></p>
+                            <div class="modal-links">
+                                <div class="form-group">
+                                    <label for="modal-image-url">图片链接</label>
+                                    <div class="copy-input">
+                                        <input type="text" id="modal-image-url" readonly>
+                                        <button id="modal-copy-url" class="btn small">复制</button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="modal-markdown-url">Markdown 格式</label>
+                                    <div class="copy-input">
+                                        <input type="text" id="modal-markdown-url" readonly>
+                                        <button id="modal-copy-markdown" class="btn small">复制</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="delete-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h3>确认删除</h3>
+                        <p>您确定要删除这张图片吗？此操作无法撤销。</p>
+                        <div class="modal-actions">
+                            <button id="confirm-delete" class="btn danger">删除</button>
+                            <button id="cancel-delete" class="btn secondary">取消</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2023 Go-Image 个人图床</p>
+        </footer>
+    </div>
+
+    <script src="/static/js/images.js"></script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

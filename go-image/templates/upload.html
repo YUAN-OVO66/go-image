@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Go-Image 个人图床</h1>
+            <nav>
+                <a href="/">首页</a>
+                <a href="/upload">上传图片</a>
+                <a href="/images">我的图片</a>
+                <a href="/logout">退出登录</a>
+            </nav>
+        </header>
+
+        <main>
+            <section class="upload-section">
+                <h2>上传图片</h2>
+                <div id="upload-container" class="upload-container">
+                    <div id="drop-area" class="drop-area">
+                        <p>拖拽图片到这里上传</p>
+                        <p>或者</p>
+                        <label for="file-input" class="btn secondary">选择图片</label>
+                        <input type="file" id="file-input" accept="image/*" style="display: none;">
+                    </div>
+                    <div id="upload-preview" class="upload-preview" style="display: none;">
+                        <img id="preview-image" src="" alt="预览图">
+                        <div class="preview-info">
+                            <p id="file-name"></p>
+                            <p id="file-size"></p>
+                        </div>
+                        <button id="upload-button" class="btn primary">上传</button>
+                        <button id="cancel-button" class="btn secondary">取消</button>
+                    </div>
+                </div>
+                <div id="upload-result" class="upload-result" style="display: none;">
+                    <h3>上传成功！</h3>
+                    <div class="result-links">
+                        <div class="form-group">
+                            <label for="image-url">图片链接</label>
+                            <div class="copy-input">
+                                <input type="text" id="image-url" readonly>
+                                <button id="copy-url" class="btn small">复制</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="markdown-url">Markdown 格式</label>
+                            <div class="copy-input">
+                                <input type="text" id="markdown-url" readonly>
+                                <button id="copy-markdown" class="btn small">复制</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="result-image">
+                        <img id="result-image-preview" src="" alt="上传的图片">
+                    </div>
+                    <button id="upload-another" class="btn primary">继续上传</button>
+                </div>
+                <div id="upload-error" class="upload-error" style="display: none;">
+                    <h3>上传失败</h3>
+                    <p id="error-message"></p>
+                    <button id="try-again" class="btn primary">重试</button>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2023 Go-Image 个人图床</p>
+        </footer>
+    </div>
+
+    <script src="/static/js/upload.js"></script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

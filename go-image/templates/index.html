@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Go-Image 个人图床</h1>
+            <nav>
+                {{ if .user }}
+                <a href="/">首页</a>
+                <a href="/upload">上传图片</a>
+                <a href="/images">我的图片</a>
+                <a href="/logout">退出登录</a>
+                {{ else }}
+                <a href="/login">登录</a>
+                {{ end }}
+            </nav>
+        </header>
+
+        <main>
+            <section class="hero">
+                <h2>简单、高效的个人图床</h2>
+                <p>轻松上传、管理和分享您的图片</p>
+                {{ if .user }}
+                <a href="/upload" class="btn primary">立即上传</a>
+                {{ else }}
+                <a href="/login" class="btn primary">立即登录</a>
+                {{ end }}
+            </section>
+
+            <section class="features">
+                <div class="feature">
+                    <h3>简单上传</h3>
+                    <p>支持拖拽上传、粘贴上传和选择文件上传</p>
+                </div>
+                <div class="feature">
+                    <h3>便捷管理</h3>
+                    <p>轻松查看、删除和搜索已上传的图片</p>
+                </div>
+                <div class="feature">
+                    <h3>快速分享</h3>
+                    <p>一键复制图片链接，方便分享到其他平台</p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2023 Go-Image 个人图床</p>
+        </footer>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

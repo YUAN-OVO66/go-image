@@ -1,0 +1,27 @@
+{
+  "1771dd61-844b-45f5-9359-b1fa9ad5f78f": {
+    "id": "1771dd61-844b-45f5-9359-b1fa9ad5f78f",
+    "filename": "6E70C7550255630370796C1EDBA71C33.jpg",
+    "size": 374729,
+    "mime_type": "image/jpeg",
+    "path": "1771dd61-844b-45f5-9359-b1fa9ad5f78f.jpg",
+    "uploaded_at": "2025-05-21T12:52:45.4801818+08:00"
+  },
+  "18347358-469d-43f4-9676-2d26c0ec13d3": {
+    "id": "18347358-469d-43f4-9676-2d26c0ec13d3",
+    "filename": "2F24A3A71C3F53E54B0E9A19C6C6309A.jpg",
+    "size": 121307,
+    "mime_type": "image/jpeg",
+    "path": "18347358-469d-43f4-9676-2d26c0ec13d3.jpg",
+    "uploaded_at": "2025-05-21T12:17:28.7947529+08:00"
+  },
+  "b1785b6c-8d4f-42bc-97fe-faebf61eb674": {
+    "id": "b1785b6c-8d4f-42bc-97fe-faebf61eb674",
+    "filename": "golang.png",
+    "size": 1175,
+    "mime_type": "image/png",
+    "path": "b1785b6c-8d4f-42bc-97fe-faebf61eb674.png",
+    "thumb_path": "b1785b6c-8d4f-42bc-97fe-faebf61eb674_thumb.png",
+    "uploaded_at": "2025-05-21T12:05:02.1346397+08:00"
+  }
+}
