@@ -197,13 +197,12 @@ document.addEventListener('DOMContentLoaded', function() {
             fetch(`/images/${imageId}`, {
                 method: 'DELETE'
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('删除图片失败');
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
                     }
-                    return response.json();
-                })
-                .then(() => {
+                    
                     // 关闭模态框
                     deleteModal.style.display = 'none';
                     
@@ -225,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 })
                 .catch(error => {
-                    alert(error.message);
+                    alert(error.message || '删除图片失败');
                 });
         }
         

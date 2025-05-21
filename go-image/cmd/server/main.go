@@ -85,7 +85,7 @@ func main() {
 	r.GET("/i/:id", api.ServeImageHandler(imageService))
 
 	// 启动服务器
-	port := 8080
+	port := 28080
 	log.Printf("服务器启动在 http://localhost:%d", port)
 	r.Run(fmt.Sprintf(":%d", port))
 }
