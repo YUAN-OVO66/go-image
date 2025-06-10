@@ -35,7 +35,7 @@ RUN adduser -D -g '' appuser
 RUN mkdir -p /app/static/uploads/thumbnails && \
     chown -R appuser:appuser /app
 
-# 从构建阶段复制二进制文件
+# 从构建阶段复制二进制文件和静态资源
 COPY --from=builder /app/go-image /app/
 COPY --from=builder /app/static /app/static
 COPY --from=builder /app/templates /app/templates
