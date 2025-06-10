@@ -15,7 +15,7 @@ import (
 	"path/filepath"
 
 	"github.com/nfnt/resize"
-	"github.com/yourusername/go-image/internal/storage"
+	"go-image/internal/storage"
 )
 
 // ImageService 处理图片相关的业务逻辑
@@ -31,7 +31,7 @@ func NewImageService(storage storage.Storage) *ImageService {
 }
 
 // UploadImage 处理图片上传
-func (s *ImageService) UploadImage(file *multipart.FileHeader) (*storage.ImageInfo, error) {
+func (s *ImageService) UploadImage(userID string, file *multipart.FileHeader) (*storage.ImageInfo, error) {
 	// 打开上传的文件
 	src, err := file.Open()
 	if err != nil {
@@ -53,7 +53,7 @@ func (s *ImageService) UploadImage(file *multipart.FileHeader) (*storage.ImageIn
 	}
 
 	// 保存原始图片
-	imageInfo, err := s.storage.Save(file.Filename, contentType, bytes.NewReader(fileContent))
+	imageInfo, err := s.storage.Save(userID, file.Filename, contentType, bytes.NewReader(fileContent))
 	if err != nil {
 		return nil, fmt.Errorf("保存图片失败: %w", err)
 	}
@@ -68,18 +68,18 @@ func (s *ImageService) UploadImage(file *multipart.FileHeader) (*storage.ImageIn
 }
 
 // GetImage 获取图片信息
-func (s *ImageService) GetImage(id string) (*storage.ImageInfo, error) {
-	return s.storage.Get(id)
+func (s *ImageService) GetImage(userID string, id string) (*storage.ImageInfo, error) {
+	return s.storage.Get(userID, id)
 }
 
 // DeleteImage 删除图片
-func (s *ImageService) DeleteImage(id string) error {
-	return s.storage.Delete(id)
+func (s *ImageService) DeleteImage(userID string, id string) error {
+	return s.storage.Delete(userID, id)
 }
 
 // ListImages 列出所有图片
-func (s *ImageService) ListImages() ([]*storage.ImageInfo, error) {
-	return s.storage.List()
+func (s *ImageService) ListImages(userID string) ([]*storage.ImageInfo, error) {
+	return s.storage.List(userID)
 }
 
 // 生成缩略图

@@ -10,11 +10,8 @@ import (
 
 // Config 系统配置
 type Config struct {
-	Initialized    bool   `json:"initialized"`
-	AdminUsername  string `json:"admin_username"`
-	AdminPassword  string `json:"admin_password"`
-	StorageLimit   int64  `json:"storage_limit"`   // 存储空间限制（字节）
-	CurrentStorage int64  `json:"current_storage"` // 当前已使用存储空间（字节）
+	StorageLimit   int64 `json:"storage_limit"`   // 存储空间限制（字节）
+	CurrentStorage int64 `json:"current_storage"` // 当前已使用存储空间（字节）
 }
 
 // ConfigService 处理系统配置相关的业务逻辑
@@ -43,25 +40,11 @@ func NewConfigService(configPath string) (*ConfigService, error) {
 	return service, nil
 }
 
-// IsInitialized 检查系统是否已初始化
-func (s *ConfigService) IsInitialized() bool {
-	s.mutex.RLock()
-	defer s.mutex.RUnlock()
-	return s.config.Initialized
-}
-
-// InitializeSystem 初始化系统配置
-func (s *ConfigService) InitializeSystem(username, password string, storageLimit int64) error {
+// InitConfig 初始化配置
+func (s *ConfigService) InitConfig(storageLimit int64) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	if s.config.Initialized {
-		return errors.New("系统已经初始化")
-	}
-
-	s.config.Initialized = true
-	s.config.AdminUsername = username
-	s.config.AdminPassword = password
 	s.config.StorageLimit = storageLimit
 	s.config.CurrentStorage = 0
 
@@ -99,10 +82,10 @@ func (s *ConfigService) loadConfig() error {
 		if os.IsNotExist(err) {
 			// 如果配置文件不存在，使用默认配置
 			s.config = &Config{
-				Initialized:    false,
+				StorageLimit:   1024 * 1024 * 1024, // 默认1GB
 				CurrentStorage: 0,
 			}
-			return nil
+			return s.saveConfig()
 		}
 		return err
 	}

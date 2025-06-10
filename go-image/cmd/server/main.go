@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -9,15 +8,13 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"github.com/yourusername/go-image/internal/api"
-	"github.com/yourusername/go-image/internal/middleware"
-	"github.com/yourusername/go-image/internal/service"
-	"github.com/yourusername/go-image/internal/storage"
+	"go-image/internal/api"
+	"go-image/internal/middleware"
+	"go-image/internal/service"
+	"go-image/internal/storage"
 )
 
 func main() {
-	// 解析命令行参数
-	flag.Parse()
 
 	// 初始化存储目录
 	initStorageDirs()
@@ -26,6 +23,10 @@ func main() {
 	configService, err := service.NewConfigService("config.json")
 	if err != nil {
 		log.Fatalf("初始化配置服务失败: %v", err)
+	}
+	// 设置默认存储限制
+	if err := configService.InitConfig(1024 * 1024 * 1024); err != nil { // 1GB
+		log.Printf("设置默认存储限制失败: %v", err)
 	}
 
 	// 创建Gin引擎
@@ -55,17 +56,15 @@ func main() {
 
 	// 注册中间件
 	r.Use(middleware.Logger())
-	r.Use(middleware.ConfigMiddleware(configService))
-
-	// 初始化路由
-	r.GET("/init", api.InitPageHandler(configService))
-	r.POST("/init", api.InitHandler(configService, authService))
 
 	// 公共路由
 	r.GET("/", api.HomeHandler)
+	r.GET("/register", api.RegisterPageHandler)
+	r.POST("/register", api.RegisterHandler)
 	r.GET("/login", api.LoginPageHandler)
 	r.POST("/login", api.LoginHandler)
 	r.GET("/logout", api.LogoutHandler)
+	r.GET("/api-docs", api.APIDocsHandler)
 
 	// 需要认证的路由组
 	auth := r.Group("/")
@@ -76,9 +75,21 @@ func main() {
 		auth.POST("/upload", api.UploadHandler(imageService))
 
 		// 图片管理
-		auth.GET("/images", api.ListImagesHandler(imageService))
+		auth.GET("/images", api.ListImagesHandler(imageService, configService))
 		auth.GET("/images/:id", api.GetImageHandler(imageService))
 		auth.DELETE("/images/:id", api.DeleteImageHandler(imageService))
+	}
+
+	// API路由组
+	apiGroup := r.Group("/api")
+	apiGroup.Use(middleware.APIAuthRequired(authService))
+	{
+		// 图片上传
+		apiGroup.POST("/upload", api.APIUploadHandler(imageService))
+		// 图片列表
+		apiGroup.GET("/images", api.APIListImagesHandler(imageService))
+		// 删除图片
+		apiGroup.DELETE("/images/:id", api.APIDeleteImageHandler(imageService))
 	}
 
 	// 公共图片访问

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 文档 - Go-Image</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .api-doc {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .api-section {
+            margin-bottom: 40px;
+        }
+        .endpoint {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .endpoint h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .method.post { background: #49cc90; color: white; }
+        .method.get { background: #61affe; color: white; }
+        .method.delete { background: #f93e3e; color: white; }
+        pre {
+            background: #272822;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        .param-table th, .param-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .param-table th {
+            background: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Go-Image 个人图床</h1>
+            <nav>
+                {{ if .user }}
+                <a href="/">首页</a>
+                <a href="/upload">上传图片</a>
+                <a href="/images">我的图片</a>
+                <a href="/api">API文档</a>
+                <a href="/logout">退出</a>
+                {{ else }}
+                <a href="/">首页</a>
+                <a href="/login">登录</a>
+                <a href="/register">注册</a>
+                {{ end }}
+            </nav>
+        </header>
+
+        <main class="api-doc">
+            <section class="api-section">
+                <h2>认证方式</h2>
+                <p>所有API请求都需要使用HTTP Basic认证。将您的用户名和密码以Base64编码的形式添加到请求头中。</p>
+                <pre>Authorization: Basic base64(username:password)</pre>
+            </section>
+
+            <section class="api-section">
+                <h2>API接口列表</h2>
+
+                <div class="endpoint">
+                    <h3><span class="method post">POST</span> /api/upload</h3>
+                    <p>上传图片文件</p>
+                    
+                    <h4>请求参数</h4>
+                    <table class="param-table">
+                        <tr>
+                            <th>参数名</th>
+                            <th>类型</th>
+                            <th>是否必需</th>
+                            <th>说明</th>
+                        </tr>
+                        <tr>
+                            <td>image</td>
+                            <td>file</td>
+                            <td>是</td>
+                            <td>要上传的图片文件（支持jpg、png、gif等格式）</td>
+                        </tr>
+                    </table>
+
+                    <h4>响应示例</h4>
+                    <pre>{
+    "code": 200,
+    "message": "上传成功",
+    "data": {
+        "id": "abc123",
+        "filename": "example.jpg",
+        "url": "http://localhost:28080/static/uploads/abc123.jpg"
+    }
+}</pre>
+                </div>
+
+                <div class="endpoint">
+                    <h3><span class="method get">GET</span> /api/images</h3>
+                    <p>获取图片列表</p>
+
+                    <h4>响应示例</h4>
+                    <pre>{
+    "code": 200,
+    "message": "获取成功",
+    "data": {
+        "images": [
+            {
+                "id": "abc123",
+                "filename": "example1.jpg",
+                "url": "http://localhost:28080/static/uploads/abc123.jpg",
+                "created_at": "2024-03-20T10:30:00Z"
+            },
+            {
+                "id": "def456",
+                "filename": "example2.png",
+                "url": "http://localhost:28080/static/uploads/def456.png",
+                "created_at": "2024-03-20T11:15:00Z"
+            }
+        ],
+        "total": 2
+    }
+}</pre>
+                </div>
+
+                <div class="endpoint">
+                    <h3><span class="method delete">DELETE</span> /api/images/:id</h3>
+                    <p>删除指定图片</p>
+
+                    <h4>路径参数</h4>
+                    <table class="param-table">
+                        <tr>
+                            <th>参数名</th>
+                            <th>类型</th>
+                            <th>说明</th>
+                        </tr>
+                        <tr>
+                            <td>id</td>
+                            <td>string</td>
+                            <td>要删除的图片ID</td>
+                        </tr>
+                    </table>
+
+                    <h4>响应示例</h4>
+                    <pre>{
+    "code": 200,
+    "message": "删除成功"
+}</pre>
+                </div>
+            </section>
+
+            <section class="api-section">
+                <h2>使用示例</h2>
+                <h4>上传图片</h4>
+                <pre>curl -X POST -u username:password \
+    -F "image=@example.jpg" \
+    http://localhost:28080/api/upload</pre>
+
+                <h4>获取图片列表</h4>
+                <pre>curl -u username:password \
+    http://localhost:28080/api/images</pre>
+
+                <h4>删除图片</h4>
+                <pre>curl -X DELETE -u username:password \
+    http://localhost:28080/api/images/abc123</pre>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

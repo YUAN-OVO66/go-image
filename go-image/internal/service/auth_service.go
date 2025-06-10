@@ -1,21 +1,64 @@
 package service
 
 import (
+	"encoding/json"
 	"errors"
+	"os"
+	"path/filepath"
 	"sync"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 // User 表示系统用户
 type User struct {
-	Username string
-	Password string
-	IsAdmin  bool
+	ID        string
+	Username  string
+	Password  string
+	CreatedAt time.Time
 }
 
-// AuthService 处理用户认证相关的业务逻辑
+// AuthService 认证服务
 type AuthService struct {
 	users map[string]*User
 	mutex sync.RWMutex
+	userFile string // 用户数据文件路径
+}
+
+// loadUsers 从文件加载用户数据
+func (s *AuthService) loadUsers() error {
+	// 确保data目录存在
+	dataDir := filepath.Join("data")
+	if err := os.MkdirAll(dataDir, 0755); err != nil {
+		return err
+	}
+
+	// 设置用户数据文件路径
+	s.userFile = filepath.Join(dataDir, "users.json")
+
+	// 读取文件
+	file, err := os.Open(s.userFile)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// 解码JSON数据
+	return json.NewDecoder(file).Decode(&s.users)
+}
+
+// saveUsers 保存用户数据到文件
+func (s *AuthService) saveUsers() error {
+	// 创建文件
+	file, err := os.Create(s.userFile)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// 编码为JSON并写入文件
+	return json.NewEncoder(file).Encode(s.users)
 }
 
 // NewAuthService 创建一个新的认证服务实例
@@ -23,16 +66,15 @@ func NewAuthService() *AuthService {
 	service := &AuthService{
 		users: make(map[string]*User),
 	}
-
-	// 从配置文件加载管理员账户
-	configService, err := NewConfigService("")
-	if err == nil && configService.IsInitialized() {
-		config := configService.GetConfig()
-		if config.AdminUsername != "" && config.AdminPassword != "" {
-			service.AddUser(config.AdminUsername, config.AdminPassword, true)
+	
+	// 从文件加载用户数据
+	if err := service.loadUsers(); err != nil {
+		// 如果文件不存在，创建空的用户数据
+		if os.IsNotExist(err) {
+			service.saveUsers()
 		}
 	}
-
+	
 	return service
 }
 
@@ -62,29 +104,22 @@ func (s *AuthService) GetUser(username string) (*User, error) {
 	return user, nil
 }
 
-// AddUser 添加新用户
-func (s *AuthService) AddUser(username, password string, isAdmin bool) error {
+// Register 注册新用户
+func (s *AuthService) Register(username, password string) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
 	if _, exists := s.users[username]; exists {
-		// 如果是初始化过程中添加管理员，则更新现有用户
-		if isAdmin {
-			s.users[username] = &User{
-				Username: username,
-				Password: password, // 在实际应用中应该使用加密密码
-				IsAdmin:  isAdmin,
-			}
-			return nil
-		}
 		return errors.New("用户名已存在")
 	}
 
 	s.users[username] = &User{
-		Username: username,
-		Password: password, // 在实际应用中应该使用加密密码
-		IsAdmin:  isAdmin,
+		ID:        uuid.New().String(),
+		Username:  username,
+		Password:  password, // 在实际应用中应该使用加密密码
+		CreatedAt: time.Now(),
 	}
 
-	return nil
+	// 保存用户数据到文件
+	return s.saveUsers()
 }

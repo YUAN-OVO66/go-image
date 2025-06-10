@@ -19,6 +19,7 @@
                 <a href="/">首页</a>
                 <a href="/upload">上传图片</a>
                 <a href="/images">我的图片</a>
+                <a href="/api-docs">API文档</a>
                 <a href="/logout">退出登录</a>
             </nav>
         </header>
@@ -55,7 +56,7 @@
                             </div>
                             <div class="image-actions">
                                 <button class="btn small view-btn" data-id="{{ .ID }}">查看</button>
-                                <button class="btn small copy-btn" data-url="/i/{{ .ID }}">复制链接</button>
+                                <button class="btn small copy-btn" data-url="/i/{{ .ID }}" onclick="copyToClipboard(getFullUrl('/i/{{ .ID }}'))">复制链接</button>
                                 <button class="btn small delete-btn" data-id="{{ .ID }}">删除</button>
                             </div>
                         </div>

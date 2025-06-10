@@ -14,24 +14,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// ImageInfo 存储图片的元数据
-type ImageInfo struct {
-	ID         string    `json:"id"`
-	Filename   string    `json:"filename"`
-	Size       int64     `json:"size"`
-	MimeType   string    `json:"mime_type"`
-	Path       string    `json:"path"`
-	ThumbPath  string    `json:"thumb_path,omitempty"`
-	UploadedAt time.Time `json:"uploaded_at"`
-}
 
-// Storage 定义存储接口
-type Storage interface {
-	Save(filename string, mimeType string, content io.Reader) (*ImageInfo, error)
-	Get(id string) (*ImageInfo, error)
-	Delete(id string) error
-	List() ([]*ImageInfo, error)
-}
 
 // LocalStorage 实现本地文件系统存储
 type LocalStorage struct {
@@ -73,11 +56,17 @@ func NewLocalStorage(basePath string) (*LocalStorage, error) {
 }
 
 // Save 保存图片到本地存储
-func (s *LocalStorage) Save(filename string, mimeType string, content io.Reader) (*ImageInfo, error) {
+func (s *LocalStorage) Save(userID string, filename string, mimeType string, content io.Reader) (*ImageInfo, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	// 生成唯一ID
 	id := uuid.New().String()
+
+	// 创建用户目录
+	userDir := filepath.Join(s.basePath, userID)
+	if err := os.MkdirAll(userDir, 0755); err != nil {
+		return nil, fmt.Errorf("创建用户目录失败: %w", err)
+	}
 
 	// 确保文件名安全
 	safeFilename := sanitizeFilename(filename)
@@ -101,7 +90,7 @@ func (s *LocalStorage) Save(filename string, mimeType string, content io.Reader)
 	}
 
 	// 构建存储路径
-	relativePath := fmt.Sprintf("%s%s", id, extension)
+	relativePath := filepath.Join(userID, fmt.Sprintf("%s%s", id, extension))
 	fullPath := filepath.Join(s.basePath, relativePath)
 
 	// 创建文件
@@ -122,6 +111,7 @@ func (s *LocalStorage) Save(filename string, mimeType string, content io.Reader)
 	// 创建图片信息
 	imageInfo := &ImageInfo{
 		ID:         id,
+		UserID:     userID,
 		Filename:   safeFilename,
 		Size:       size,
 		MimeType:   mimeType,
@@ -141,23 +131,23 @@ func (s *LocalStorage) Save(filename string, mimeType string, content io.Reader)
 }
 
 // Get 获取图片信息
-func (s *LocalStorage) Get(id string) (*ImageInfo, error) {
+func (s *LocalStorage) Get(userID string, id string) (*ImageInfo, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
 	image, exists := s.images[id]
-	if !exists {
+	if !exists || image.UserID != userID {
 		return nil, errors.New("图片不存在")
 	}
 	return image, nil
 }
 
 // Delete 删除图片
-func (s *LocalStorage) Delete(id string) error {
+func (s *LocalStorage) Delete(userID string, id string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	image, exists := s.images[id]
-	if !exists {
+	if !exists || image.UserID != userID {
 		return errors.New("图片不存在")
 	}
 
@@ -186,13 +176,15 @@ func (s *LocalStorage) Delete(id string) error {
 }
 
 // List 列出所有图片
-func (s *LocalStorage) List() ([]*ImageInfo, error) {
+func (s *LocalStorage) List(userID string) ([]*ImageInfo, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
 	var images []*ImageInfo
 	for _, image := range s.images {
-		images = append(images, image)
+		if image.UserID == userID {
+			images = append(images, image)
+		}
 	}
 	return images, nil
 }

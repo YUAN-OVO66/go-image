@@ -1,4 +1,4 @@
-module github.com/yourusername/go-image
+module go-image
 
 go 1.16
 
